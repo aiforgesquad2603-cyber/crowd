@@ -1,0 +1,10 @@
+terminal 1
+
+cd frontend
+ng serve
+
+
+terminal 2
+
+cd backend
+uvicorn main:app --reload

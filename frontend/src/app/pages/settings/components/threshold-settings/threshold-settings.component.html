@@ -1,0 +1,21 @@
+<app-glass-card customClasses="p-6 flex flex-col justify-between">
+  
+  <div>
+    <h2 class="text-xl font-medium text-gray-200 mb-6 tracking-wide">System Thresholds</h2>
+
+    <div class="mb-6">
+      <input type="number" 
+             [(ngModel)]="crowdLimit" 
+             placeholder="Crowd Limit per Gate (e.g., 50)"
+             class="w-full bg-[#0f172a]/80 border border-slate-600/50 rounded-lg px-4 py-3 text-gray-200 placeholder-gray-500 focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all">
+    </div>
+  </div>
+
+  <div>
+    <button (click)="saveThresholds()"
+            class="w-full bg-gradient-to-b from-[#3b82f6] to-[#1d4ed8] hover:from-[#60a5fa] hover:to-[#2563eb] border border-blue-400/30 text-white font-medium py-3 rounded-lg shadow-[0_0_15px_rgba(59,130,246,0.2)] transition-all duration-300 active:scale-[0.98]">
+      Save Thresholds
+    </button>
+  </div>
+
+</app-glass-card>

@@ -1,0 +1,28 @@
+<aside class="w-64 bg-[#0f172a] border-r border-slate-700/50 h-screen flex flex-col">
+  
+  <div class="p-6 flex items-center space-x-3 border-b border-slate-700/50">
+    <div class="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center shadow-[0_0_15px_rgba(59,130,246,0.5)]">
+      <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+    </div>
+    <span class="text-xl font-bold text-gray-100 tracking-wider">CrowdGuard<span class="text-blue-500">AI</span></span>
+  </div>
+
+  <nav class="flex-1 px-4 py-6 space-y-2">
+    
+    <a *ngFor="let item of menuItems" 
+       [routerLink]="item.route" 
+       routerLinkActive="bg-[#1e293b] text-blue-400 border-l-4 border-blue-500"
+       [routerLinkActiveOptions]="{exact: true}"
+       class="flex items-center px-4 py-3 text-gray-400 rounded-lg hover:bg-[#1e293b] hover:text-gray-200 transition-colors cursor-pointer group border-l-4 border-transparent">
+      
+      <svg class="w-5 h-5 mr-3 group-hover:text-blue-400 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" [attr.d]="item.icon"></path>
+        <path *ngIf="item.name === 'Settings'" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+      </svg>
+      
+      <span class="font-medium text-sm">{{ item.name }}</span>
+    </a>
+
+  </nav>
+
+</aside>
