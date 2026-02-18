@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ApiService } from '../../services/api.service';
+import { HttpClient } from '@angular/common/http'; // <-- Changed to HttpClient for consistency
 
 @Component({
   selector: 'app-guard-assign',
@@ -18,16 +18,25 @@ export class GuardAssignComponent implements OnInit {
 
   // This will now hold your REAL guards from MongoDB
   guards: any[] = [];
+  
+  // --- NEW: Multi-tenant Account ID ---
+  userEmail: string = ''; 
 
-  constructor(private apiService: ApiService) { }
+  constructor(private http: HttpClient) { }
 
   ngOnInit(): void {
+    // 1. Securely fetch the logged-in user's email
+    this.userEmail = localStorage.getItem('userEmail') || '';
+    
     // Automatically fetch real guards when the page opens!
     this.loadRealGuards();
   }
 
   loadRealGuards() {
-    this.apiService.getGuards().subscribe({
+    if (!this.userEmail) return; // Stop if no email
+
+    // 2. Pass the user_email to the backend to get ONLY their guards
+    this.http.get<any[]>(`http://localhost:8000/api/guards?user_email=${this.userEmail}`).subscribe({
       next: (data) => {
         this.guards = data; 
       },

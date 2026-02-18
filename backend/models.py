@@ -1,20 +1,25 @@
 from pydantic import BaseModel
 from typing import Optional
 
-# Existing Models
+# ==========================================
+# --- ACCOUNT-LINKED MODELS (Multi-Tenant) ---
+# ==========================================
 class GuardModel(BaseModel):
+    user_email: str  # <-- Ithu thaan account-ah pirikkum!
     name: str
     mobile: str
     gate: str
     status: Optional[str] = "Active"
 
 class CameraModel(BaseModel):
+    user_email: str  # <-- Ithu thaan account-ah pirikkum!
     gate: str
     rtsp_url: str
     status: str = "Offline"
 
+
 # ==========================================
-# --- NEW: USER AUTHENTICATION MODELS ---
+# --- USER AUTHENTICATION MODELS ---
 # ==========================================
 class UserModel(BaseModel):
     name: str
@@ -25,3 +30,7 @@ class UserModel(BaseModel):
 class LoginModel(BaseModel):
     email: str
     password: str
+
+class ResetPasswordModel(BaseModel):
+    email: str
+    new_password: str

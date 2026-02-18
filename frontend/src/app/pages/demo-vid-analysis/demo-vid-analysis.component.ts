@@ -25,6 +25,9 @@ export class DemoVidAnalysisComponent implements OnInit, OnDestroy {
   // Array to hold dynamic cameras
   cameras: CameraFeed[] = [];
   
+  // --- NEW: Multi-tenant Account ID ---
+  userEmail: string = '';
+
   // To check if ANY alarm is ringing to show the global "Silence All" button
   get isAnyAlarmRinging(): boolean {
     return this.cameras.some(cam => cam.isAlarmRinging);
@@ -33,8 +36,13 @@ export class DemoVidAnalysisComponent implements OnInit, OnDestroy {
   constructor(private http: HttpClient) {}
 
   ngOnInit() {
-    // 1. DYNAMICALLY FETCH GATES FROM DATABASE!
-    this.http.get<any[]>('http://localhost:8000/api/cameras').subscribe({
+    // 1. Securely fetch the logged-in user's email
+    this.userEmail = localStorage.getItem('userEmail') || '';
+
+    if (!this.userEmail) return; // Stop if not logged in
+
+    // 2. DYNAMICALLY FETCH GATES ONLY FOR THIS USER! (Fixes GET 422 Error)
+    this.http.get<any[]>(`http://localhost:8000/api/cameras?user_email=${this.userEmail}`).subscribe({
       next: (savedCams) => {
         let gateNames: string[] = [];
         
@@ -46,7 +54,7 @@ export class DemoVidAnalysisComponent implements OnInit, OnDestroy {
           gateNames = ['Gate 1', 'Gate 2', 'Gate 3', 'Gate 4', 'Gate 5']; 
         }
 
-        // 2. Create a video box for EVERY gate dynamically!
+        // Create a video box for EVERY gate dynamically!
         gateNames.forEach((name, index) => {
           this.cameras.push({
             id: index + 1,
@@ -84,6 +92,11 @@ export class DemoVidAnalysisComponent implements OnInit, OnDestroy {
 
   // Analyze ONE specific camera
   analyzeCamera(index: number) {
+    if (!this.userEmail) {
+      alert("Security Lock: Please Logout and Login again to sync your account.");
+      return;
+    }
+
     const cam = this.cameras[index];
     if (!cam.file) return;
 
@@ -95,6 +108,7 @@ export class DemoVidAnalysisComponent implements OnInit, OnDestroy {
     const formData = new FormData();
     formData.append('file', cam.file);
     formData.append('gate', cam.gateName); 
+    formData.append('user_email', this.userEmail); // <-- Fixes POST 422 Error!
 
     this.http.post('http://localhost:8000/api/analyze-video', formData).subscribe({
       next: (response: any) => {
@@ -105,6 +119,7 @@ export class DemoVidAnalysisComponent implements OnInit, OnDestroy {
       error: (err) => {
         console.error(`Analysis Failed for ${cam.gateName}`, err);
         cam.isAnalyzing = false;
+        alert(`❌ Analysis failed for ${cam.gateName}.`);
       }
     });
   }

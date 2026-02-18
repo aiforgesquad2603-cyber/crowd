@@ -24,16 +24,25 @@ export class AnalysisReportComponent implements OnInit {
   };
   
   riskZones: any[] = [];
+  
+  // --- NEW: Multi-tenant Account ID ---
+  userEmail: string = '';
 
   constructor(private http: HttpClient) { }
 
   ngOnInit(): void {
+    // 1. Securely fetch the logged-in user's email
+    this.userEmail = localStorage.getItem('userEmail') || '';
+
     // Fetch real data when page loads!
     this.fetchAnalytics();
   }
 
   fetchAnalytics() {
-    this.http.get<any>('http://localhost:8000/api/analytics').subscribe({
+    if (!this.userEmail) return; // Stop if no email is found
+
+    // 2. Fetch analytics ONLY for this specific user account!
+    this.http.get<any>(`http://localhost:8000/api/analytics?user_email=${this.userEmail}`).subscribe({
       next: (data) => {
         this.metrics = {
           peakDensity: data.peakDensity,

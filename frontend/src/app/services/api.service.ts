@@ -16,22 +16,35 @@ export class ApiService {
 
   constructor(private http: HttpClient) { }
 
-  // Get all guards from MongoDB
-  getGuards(): Observable<any> {
-    return this.http.get(this.apiUrl);
+  // 🔒 MAGIC FUNCTION: Gets your unique account email securely from browser
+  private getUserEmail(): string {
+    return localStorage.getItem('userEmail') || '';
   }
 
-  // Send a new guard to MongoDB
+  // --- ACCOUNT BASED APIs ---
+
+  // 1. Get all guards from MongoDB (ONLY FOR THIS USER)
+  getGuards(): Observable<any> {
+    const email = this.getUserEmail();
+    // Attaching user_email to the URL fixes the 422 Error!
+    return this.http.get(`${this.apiUrl}?user_email=${email}`);
+  }
+
+  // 2. Send a new guard to MongoDB
   addGuard(guardData: any): Observable<any> {
+    // Safety check: Attach email if it's missing in the data
+    if (!guardData.user_email) {
+      guardData.user_email = this.getUserEmail();
+    }
     return this.http.post(this.apiUrl, guardData);
   }
 
-  // Delete a guard
+  // 3. Delete a guard
   deleteGuard(id: string): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${id}`);
   }
 
-  // Tell the app to refresh the table
+  // 4. Tell the app to refresh the table
   notifyGuardsUpdated() {
     this.guardsUpdated.next(true);
   }

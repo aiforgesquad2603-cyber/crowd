@@ -1,5 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+// 1. IMPORT ANGULAR SECURITY BYPASS TOOLS
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser'; 
 
 @Component({
   selector: 'app-live-monitoring',
@@ -10,19 +12,32 @@ export class LiveMonitoringComponent implements OnInit {
   
   cameraNodes: any[] = [];
   selectedCamera: any = null;
-  liveStreamUrl: string = '';
+  
+  // 2. CHANGE TYPE TO ACCEPT SAFE URLS
+  liveStreamUrl: SafeResourceUrl | string = ''; 
   
   // Track which view is currently active
   currentMode: string = 'object'; 
 
-  constructor(private http: HttpClient) {}
+  // Multi-tenant Account ID
+  userEmail: string = '';
+
+  // 3. INJECT THE SANITIZER HERE!
+  constructor(private http: HttpClient, private sanitizer: DomSanitizer) {}
 
   ngOnInit(): void {
+    // Securely fetch the logged-in user's email
+    this.userEmail = localStorage.getItem('userEmail') || '';
+    
+    // Load cameras for this account
     this.loadCameras();
   }
 
   loadCameras() {
-    this.http.get<any[]>('http://localhost:8000/api/cameras').subscribe({
+    if (!this.userEmail) return; // Stop if no email
+
+    // Fetch cameras ONLY for this specific user account!
+    this.http.get<any[]>(`http://localhost:8000/api/cameras?user_email=${this.userEmail}`).subscribe({
       next: (cams) => {
         this.cameraNodes = cams;
         const firstLive = cams.find(c => c.status === 'Live' || c.rtsp_url === '0') || cams[0];
@@ -39,7 +54,7 @@ export class LiveMonitoringComponent implements OnInit {
     this.updateStreamUrl();
   }
 
-  // --- NEW: Toggle Function! ---
+  // Toggle Function! 
   setMode(newMode: string) {
     this.currentMode = newMode;
     this.updateStreamUrl();
@@ -47,9 +62,11 @@ export class LiveMonitoringComponent implements OnInit {
 
   updateStreamUrl() {
     if (this.selectedCamera && (this.selectedCamera.status === 'Live' || this.selectedCamera.rtsp_url === '0')) {
-      // We append a random timestamp so the browser instantly refreshes the image feed!
       const t = new Date().getTime();
-      this.liveStreamUrl = `http://localhost:8000/api/video-feed/${this.selectedCamera.gate}?mode=${this.currentMode}&t=${t}`;
+      const rawUrl = `http://localhost:8000/api/video-feed/${this.selectedCamera.gate}?user_email=${this.userEmail}&mode=${this.currentMode}&t=${t}`;
+      
+      // 4. SECURE STREAM BYPASS: Tell Angular this raw URL is 100% safe to display!
+      this.liveStreamUrl = this.sanitizer.bypassSecurityTrustResourceUrl(rawUrl);
     } else {
       this.liveStreamUrl = '';
     }

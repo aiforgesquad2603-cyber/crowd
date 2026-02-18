@@ -1,18 +1,20 @@
 <div class="min-h-screen bg-[#0f172a] flex items-center justify-center p-4">
-  <div class="max-w-md w-full bg-[#1e293b] rounded-2xl shadow-2xl border border-slate-700 overflow-hidden">
+  <div class="max-w-md w-full bg-[#1e293b] rounded-2xl shadow-2xl border border-slate-700 overflow-hidden transition-all duration-300">
     
     <div class="bg-gradient-to-r from-blue-600 to-teal-500 p-6 text-center">
       <h2 class="text-3xl font-extrabold text-white tracking-wider flex justify-center items-center">
         <svg class="w-8 h-8 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
         CrowdGuard<span class="text-teal-200">AI</span>
       </h2>
-      <p class="text-blue-100 mt-2 text-sm">{{ isLoginMode ? 'Sign in to access Command Center' : 'Register a new Security Admin' }}</p>
+      <p class="text-blue-100 mt-2 text-sm">
+        {{ isForgotPasswordMode ? 'Securely reset your account password' : (isLoginMode ? 'Sign in to access Command Center' : 'Register a new Security Admin') }}
+      </p>
     </div>
 
     <div class="p-8">
       <form (ngSubmit)="onSubmit()">
         
-        <div class="mb-4" *ngIf="!isLoginMode">
+        <div class="mb-4" *ngIf="!isLoginMode && !isForgotPasswordMode">
           <label class="block text-gray-400 text-xs font-bold mb-2 uppercase tracking-wide">Full Name</label>
           <input type="text" [(ngModel)]="authData.name" name="name" required class="w-full bg-[#0f172a] text-white border border-slate-600 rounded-lg p-3 outline-none focus:border-teal-500 transition-colors">
         </div>
@@ -22,26 +24,42 @@
           <input type="email" [(ngModel)]="authData.email" name="email" required class="w-full bg-[#0f172a] text-white border border-slate-600 rounded-lg p-3 outline-none focus:border-teal-500 transition-colors">
         </div>
 
-        <div class="mb-4" *ngIf="!isLoginMode">
+        <div class="mb-4" *ngIf="!isLoginMode && !isForgotPasswordMode">
           <label class="block text-gray-400 text-xs font-bold mb-2 uppercase tracking-wide">Mobile Number</label>
           <input type="tel" [(ngModel)]="authData.mobile" name="mobile" required class="w-full bg-[#0f172a] text-white border border-slate-600 rounded-lg p-3 outline-none focus:border-teal-500 transition-colors">
         </div>
 
-        <div class="mb-6">
-          <label class="block text-gray-400 text-xs font-bold mb-2 uppercase tracking-wide">Password</label>
+        <div class="mb-2">
+          <label class="block text-gray-400 text-xs font-bold mb-2 uppercase tracking-wide">
+            {{ isForgotPasswordMode ? 'Enter New Password' : 'Password' }}
+          </label>
           <input type="password" [(ngModel)]="authData.password" name="password" required class="w-full bg-[#0f172a] text-white border border-slate-600 rounded-lg p-3 outline-none focus:border-teal-500 transition-colors">
         </div>
 
+        <div class="text-right mb-6 h-6">
+          <button *ngIf="isLoginMode && !isForgotPasswordMode" type="button" (click)="toggleForgotPassword()" class="text-xs text-teal-400 hover:text-teal-300 font-semibold hover:underline transition-colors">
+            Forgot Password?
+          </button>
+        </div>
+
         <button type="submit" [disabled]="isLoading" class="w-full bg-teal-500 hover:bg-teal-400 text-white font-bold py-3 px-4 rounded-lg shadow-lg transition-transform transform hover:scale-[1.02] disabled:opacity-50">
-          {{ isLoading ? 'Processing...' : (isLoginMode ? 'SECURE LOGIN' : 'CREATE ACCOUNT') }}
+          {{ isLoading ? 'Processing...' : (isForgotPasswordMode ? 'RESET PASSWORD' : (isLoginMode ? 'SECURE LOGIN' : 'CREATE ACCOUNT')) }}
         </button>
 
       </form>
 
-      <p class="text-center text-gray-400 mt-6 text-sm">
+      <p class="text-center text-gray-400 mt-6 text-sm" *ngIf="!isForgotPasswordMode">
         {{ isLoginMode ? "Don't have an account?" : "Already have an account?" }} 
         <button type="button" (click)="toggleMode()" class="text-teal-400 font-bold hover:underline">
           {{ isLoginMode ? 'Sign Up' : 'Sign In' }}
+        </button>
+      </p>
+
+      <p class="text-center text-gray-400 mt-6 text-sm" *ngIf="isForgotPasswordMode">
+        Remember your password? 
+        <button type="button" (click)="backToLogin()" class="text-teal-400 font-bold hover:underline flex items-center justify-center mx-auto mt-1">
+          <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+          Back to Login
         </button>
       </p>
 

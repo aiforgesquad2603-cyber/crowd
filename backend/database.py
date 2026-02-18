@@ -7,7 +7,9 @@ load_dotenv()
 
 # Connect to MongoDB (Defaults to local if no .env is found)
 MONGO_URI = os.getenv("MONGO_URI", "mongodb://localhost:27017")
-client = MongoClient(MONGO_URI)
+
+# PRO-TIP: Added a 5-second timeout. If MongoDB is off, it won't hang your terminal forever!
+client = MongoClient(MONGO_URI, serverSelectionTimeoutMS=5000)
 
 # Select the database named "crowdguardai"
 db = client.crowdguardai
@@ -22,4 +24,4 @@ try:
     print(f"📂 Active Collections: {collections}")
     
 except Exception as e:
-    print(f"❌ MongoDB connection error: {e}")
+    print(f"❌ MongoDB connection error (Is MongoDB running?): {e}")
