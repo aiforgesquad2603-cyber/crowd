@@ -1,21 +1,21 @@
 # Web Framework & Server
-fastapi==0.109.0
-uvicorn[standard]==0.27.0
+fastapi
+uvicorn
 
 # Database
-pymongo==4.6.1
+pymongo
 
 # AI & Computer Vision (YOLO/HOG)
-opencv-python==4.9.0.80
+opencv-python
 
 # Environment Variables (.env)
-python-dotenv==1.0.1
+python-dotenv
 
 # File Uploads (For Demo Video Analysis)
 python-multipart==0.0.6
 
 # HTTP Requests (For Fast2SMS API Alerts)
-requests==2.31.0
+requests
 
 # Data Validation
-pydantic==2.5.3
+pydantic
