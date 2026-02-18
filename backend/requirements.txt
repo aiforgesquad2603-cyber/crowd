@@ -19,3 +19,4 @@ requests
 
 # Data Validation
 pydantic
+pymongo[srv]
